@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#f5f7f4" />
+    <title>Pharmacy | Store System</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="app.js" defer></script>
+    <script src="java%20script.js" defer></script>
+    
+  </head>
+  <body>
+    <img src="images/pharmacy.jpg"
+     alt="Opulence Pharmacy"
+     width="250" class="pharmacy-image">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="#"
+        ><b>✚</b><span><strong>Pharmacy</strong><small>store</small></span></a
+      >
+      <p class="label">WORKSPACE</p>
+      <nav>
+        <button class="nav active" data-page="dashboard">⌂　Overview</button
+        ><button class="nav" data-page="inventory">
+          ▤　Inventory <i id="lowBadge">0</i></button
+        ><button class="nav" data-page="sales">◷　Sales</button
+        ><button class="nav" data-page="suppliers">♧　Suppliers</button>
+      </nav>
+      <div class="sidebar-foot">
+        <div class="tip">
+          <b>✳　Stock reminder</b>
+          <p>Review low stock items before they run out.</p>
+          <button data-page="inventory">Review inventory →</button>
+        </div>
+        <div class="profile">
+          <b>AM</b
+          ><span
+            ><strong>Admin Manager</strong
+            ><small>Store administrator</small></span
+          >
+        </div>
+      </div>
+    </aside>
+    <main>
+      <header>
+        <button id="menu" class="menu">☰</button
+        ><span>Pharmacy　/　<strong id="crumb">Overview</strong></span
+        ><small id="today"></small>
+      </header>
+      <section class="page active" id="dashboard">
+        <div class="heading">
+          <div>
+            <small class="eyebrow">PHARMACY OVERVIEW</small>
+            <h1>Good morning, Admin <em>✦</em></h1>
+            <p>Here’s what’s happening at your pharmacy today.</p>
+          </div>
+          <button class="primary" data-action="sale">＋ New sale</button>
+        </div>
+        <div class="welcome-banner">
+          <div>
+            <span>YOUR PHARMACY, AT A GLANCE</span>
+            <h2>Care starts with a well-stocked shelf.</h2>
+            <p>
+              Keep medicines organized, track sales, and stay ready for your
+              customers.
+            </p>
+            <button data-page="inventory">Explore inventory <b>→</b></button>
+          </div>
+          <img
+            src="images/medicine-care.svg"
+            alt="Illustration of medicine bottle, box, and capsule"
+          />
+        </div>
+        <div class="stats">
+          <article>
+            <span>Total revenue</span><b id="revenue">KSh 0.00</b
+            ><small>From recorded sales</small>
+          </article>
+          <article>
+            <span>Sales transactions</span><b id="saleCount">0</b
+            ><small>All time</small>
+          </article>
+          <article>
+            <span>Medicines in stock</span><b id="medicineCount">0</b
+            ><small>Unique products</small>
+          </article>
+          <article>
+            <span>Low stock alerts</span><b id="alertCount">0</b
+            ><small>Needs attention</small>
+          </article>
+        </div>
+        <div class="columns">
+          <section class="panel">
+            <div class="panel-head">
+              <div>
+                <h2>Recent sales</h2>
+                <small>Your latest transactions</small>
+              </div>
+              <button class="link" data-page="sales">View all →</button>
+            </div>
+            <div class="scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>SALE</th>
+                    <th>DATE & TIME</th>
+                    <th>ITEMS</th>
+                    <th>TOTAL</th>
+                    <th>STATUS</th>
+                  </tr>
+                </thead>
+                <tbody id="recentRows"></tbody>
+              </table>
+            </div>
+            <p class="empty hidden" id="recentEmpty">
+              No sales yet. Record your first sale to see it here.
+            </p>
+          </section>
+          <section class="panel">
+            <div class="panel-head">
+              <div>
+                <h2>Stock overview</h2>
+                <small>Products that need attention</small>
+              </div>
+              <button class="link" data-page="inventory">↗</button>
+            </div>
+            <div id="lowList" class="low-list"></div>
+          </section>
+        </div>
+        <section class="panel quick">
+          <div class="panel-head">
+            <div>
+              <h2>Quick actions</h2>
+              <small>Common tasks for your store</small>
+            </div>
+          </div>
+          <div class="quick-actions">
+            <button data-action="sale">
+              <b>＋</b
+              ><span
+                ><strong>Record a sale</strong
+                ><small>Capture a customer purchase</small></span
+              >→</button
+            ><button data-action="medicine">
+              <b>▤</b
+              ><span
+                ><strong>Add medicine</strong
+                ><small>Add a product to inventory</small></span
+              >→</button
+            ><button data-action="supplier">
+              <b>♧</b
+              ><span
+                ><strong>Add supplier</strong
+                ><small>Save a supplier contact</small></span
+              >→
+            </button>
+          </div>
+        </section>
+      </section>
+      <section class="page" id="inventory">
+        <div class="heading">
+          <div>
+            <small class="eyebrow">PRODUCTS & STOCK</small>
+            <h1>Inventory</h1>
+            <p>Keep track of medicines available in your store.</p>
+          </div>
+          <button class="primary" data-action="medicine">
+            ＋ Add medicine
+          </button>
+        </div>
+        <div class="totals">
+          <div><b id="invCount">0</b><small>Total products</small></div>
+          <div><b id="invLow">0</b><small>Low stock</small></div>
+          <div><b id="invValue">KSh 0.00</b><small>Stock value</small></div>
+        </div>
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>All medicines</h2>
+              <small>Manage product details and quantities</small>
+            </div>
+            <input id="medicineSearch" placeholder="⌕  Search medicines…" />
+          </div>
+          <div class="scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>MEDICINE</th>
+                  <th>CATEGORY</th>
+                  <th>STOCK</th>
+                  <th>UNIT PRICE</th>
+                  <th>SUPPLIER</th>
+                  <th>STATUS</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="inventoryRows"></tbody>
+            </table>
+          </div>
+          <p class="empty hidden" id="inventoryEmpty">
+            No medicines match your search.
+          </p>
+        </section>
+      </section>
+      <section class="page" id="sales">
+        <div class="heading">
+          <div>
+            <small class="eyebrow">TRANSACTION HISTORY</small>
+            <h1>Sales</h1>
+            <p>Review your recorded pharmacy sales.</p>
+          </div>
+          <button class="primary" data-action="sale">＋ New sale</button>
+        </div>
+        <div class="totals">
+          <div>
+            <b id="salesRevenue">KSh 0.00</b><small>Total revenue</small>
+          </div>
+          <div><b id="salesCount">0</b><small>Transactions</small></div>
+          <div><b id="itemsSold">0</b><small>Items sold</small></div>
+        </div>
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>All transactions</h2>
+              <small>Sales recorded in this browser</small>
+            </div>
+          </div>
+          <div class="scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>SALE</th>
+                  <th>DATE & TIME</th>
+                  <th>ITEMS</th>
+                  <th>QUANTITY</th>
+                  <th>TOTAL</th>
+                  <th>STATUS</th>
+                </tr>
+              </thead>
+              <tbody id="salesRows"></tbody>
+            </table>
+          </div>
+          <p class="empty hidden" id="salesEmpty">
+            No transactions recorded yet.
+          </p>
+        </section>
+      </section>
+      <section class="page" id="suppliers">
+        <div class="heading">
+          <div>
+            <small class="eyebrow">PARTNERS & CONTACTS</small>
+            <h1>Suppliers</h1>
+            <p>Manage suppliers for your pharmacy store.</p>
+          </div>
+          <button class="primary" data-action="supplier">
+            ＋ Add supplier
+          </button>
+        </div>
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Supplier directory</h2>
+              <small id="supplierCount">0 suppliers</small>
+            </div>
+            <input id="supplierSearch" placeholder="⌕  Search suppliers…" />
+          </div>
+          <div class="scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>SUPPLIER</th>
+                  <th>PHONE</th>
+                  <th>EMAIL</th>
+                  <th>MEDICINES</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="supplierRows"></tbody>
+            </table>
+          </div>
+          <p class="empty hidden" id="supplierEmpty">
+            No suppliers match your search.
+          </p>
+        </section>
+      </section>
+      <footer>
+        ✚ Afya Pharmacy Store System　•　Data saved on this device
+      </footer>
+    </main>
+    <div class="backdrop hidden" id="backdrop">
+      <section class="modal" role="dialog" aria-modal="true">
+        <div class="modal-head">
+          <div>
+            <small id="modalEyebrow">PHARMACY MANAGEMENT</small>
+            <h2 id="modalTitle">Add medicine</h2>
+          </div>
+          <button id="close" aria-label="Close">×</button>
+        </div>
+        <form id="form">
+          <div id="fields" class="fields"></div>
+          <p id="error" class="error hidden"></p>
+          <div class="modal-actions">
+            <button type="button" class="quiet" id="cancel">Cancel</button
+            ><button class="primary" id="submit">Save</button>
+          </div>
+        </form>
+      </section>
+    </div>
+    <div class="toast" id="toast"></div>
+  </body>
+</html>
