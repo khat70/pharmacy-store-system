@@ -1,22 +1,50 @@
+<?php
+session_start();
+
+if (empty($_SESSION['user_id'])) {
+    header('Location: login.php');
+    exit;
+}
+
+$role = $_SESSION['role'] ?? '';
+$fullName = $_SESSION['full_name'] ?? 'User';
+$initial = strtoupper(substr($fullName, 0, 1));
+?>
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="theme-color" content="#f5f7f4" />
-    <title>Pharmacy | Store System</title>
+    <title> Royal Pharmacy | Store System</title>
     <link rel="stylesheet" href="styles.css" />
+    <style>
+  body.role-cashier .nav[data-page="inventory"],
+  body.role-cashier .nav[data-page="suppliers"],
+  body.role-cashier #inventory,
+  body.role-cashier #suppliers,
+  body.role-cashier [data-action="medicine"],
+  body.role-cashier [data-action="supplier"],
+  body.role-cashier .tip {
+    display: none !important;
+  }
+
+  body.role-pharmacist .nav[data-page="sales"],
+  body.role-pharmacist #sales,
+  body.role-pharmacist [data-action="sale"] {
+    display: none !important;
+  }
+</style>
     <script src="app.js" defer></script>
     <script src="java%20script.js" defer></script>
-    
   </head>
-  <body>
-    <img src="images/pharmacy.jpg"
-     alt="Opulence Pharmacy"
-     width="250" class="pharmacy-image">
+  <body class="role-<?= htmlspecialchars($role, ENT_QUOTES, 'UTF-8') ?>">
+    <div class="welcome-banner">
+  <img src="images/pharmacy.jpg" alt="Medicine and pharmacy items">
+</div>
     <aside class="sidebar" id="sidebar">
       <a class="brand" href="#"
-        ><b>✚</b><span><strong>Pharmacy</strong><small>store</small></span></a
+        ><b>✚</b><span><strong> Royal Pharmacy</strong><small>store</small></span></a
       >
       <p class="label">WORKSPACE</p>
       <nav>
@@ -33,25 +61,26 @@
           <button data-page="inventory">Review inventory →</button>
         </div>
         <div class="profile">
-          <b>AM</b
-          ><span
-            ><strong>Admin Manager</strong
-            ><small>Store administrator</small></span
-          >
-        </div>
+  <b><?= htmlspecialchars($initial, ENT_QUOTES, 'UTF-8') ?></b>
+  <span>
+    <strong><?= htmlspecialchars($fullName, ENT_QUOTES, 'UTF-8') ?></strong>
+    <small><?= htmlspecialchars(ucfirst($role), ENT_QUOTES, 'UTF-8') ?></small>
+  </span>
+</div>
       </div>
     </aside>
     <main>
       <header>
         <button id="menu" class="menu">☰</button
-        ><span>Pharmacy　/　<strong id="crumb">Overview</strong></span
+        <img class="header-logo" src="images/pharmacy.jpg" alt="Pharmacy">
+        <span><strong>Pharmacy　/　</strong><strong id="crumb">Overview</strong></span
         ><small id="today"></small>
       </header>
       <section class="page active" id="dashboard">
         <div class="heading">
           <div>
-            <small class="eyebrow">PHARMACY OVERVIEW</small>
-            <h1>Good morning, Admin <em>✦</em></h1>
+            <small class="eyebrow"> Royal Pharmacy OVERVIEW</small>
+            <h1>Good morning, <?= htmlspecialchars(ucfirst($fullName), ENT_QUOTES, 'UTF-8') ?><em>✦</em></h1> 
             <p>Here’s what’s happening at your pharmacy today.</p>
           </div>
           <button class="primary" data-action="sale">＋ New sale</button>
@@ -67,7 +96,7 @@
             <button data-page="inventory">Explore inventory <b>→</b></button>
           </div>
           <img
-            src="images/medicine-care.svg"
+            src="images/pharmacy.jpg"
             alt="Illustration of medicine bottle, box, and capsule"
           />
         </div>
@@ -125,6 +154,13 @@
               <button class="link" data-page="inventory">↗</button>
             </div>
             <div id="lowList" class="low-list"></div>
+            <div class="panel-head" style="margin-top: 18px;">
+  <div>
+    <h2>Expired or expiring within 30 days</h2>
+    <small>Medicines to check soon</small>
+  </div>
+</div>
+<div id="expiryList" class="low-list"></div>  
           </section>
         </div>
         <section class="panel quick">
@@ -188,6 +224,7 @@
                   <th>MEDICINE</th>
                   <th>CATEGORY</th>
                   <th>STOCK</th>
+                  <th>EXPIRY DATE</th>
                   <th>UNIT PRICE</th>
                   <th>SUPPLIER</th>
                   <th>STATUS</th>
@@ -218,6 +255,17 @@
           <div><b id="salesCount">0</b><small>Transactions</small></div>
           <div><b id="itemsSold">0</b><small>Items sold</small></div>
         </div>
+        <div class="panel" style="display: flex; flex-wrap: wrap; gap: 12px; align-items: end; margin-bottom: 17px;">
+  <label>From
+    <input type="date" id="salesFrom">
+  </label>
+  <label>To
+    <input type="date" id="salesTo">
+  </label>
+  <button type="button" class="primary" id="applySalesReport">Show report</button>
+  <button type="button" class="row-action" id="clearSalesReport">Clear</button>
+  <p id="salesReportSummary">Showing all sales.</p>
+</div>
         <section class="panel">
           <div class="panel-head">
             <div>
@@ -264,6 +312,7 @@
             </div>
             <input id="supplierSearch" placeholder="⌕  Search suppliers…" />
           </div>
+          <div id="supplierList">Loading suppliers…</div>
           <div class="scroll">
             <table>
               <thead>
@@ -284,7 +333,7 @@
         </section>
       </section>
       <footer>
-        ✚ Afya Pharmacy Store System　•　Data saved on this device
+        ✚  Pharmacy Store System　•　Data saved on this device
       </footer>
     </main>
     <div class="backdrop hidden" id="backdrop">
@@ -307,5 +356,42 @@
       </section>
     </div>
     <div class="toast" id="toast"></div>
+    <script>
+  const supplierList = document.getElementById("supplierList");
+
+  fetch("suppliers.php")
+    .then(response => {
+      if (!response.ok) throw new Error("Could not load suppliers");
+      return response.json();
+    })
+    .then(suppliers => {
+      supplierList.replaceChildren();
+
+      if (!suppliers.length) {
+        supplierList.textContent = "No suppliers found.";
+        return;
+      }
+
+      suppliers.forEach(supplier => {
+        const row = document.createElement("p");
+        const name = document.createElement("strong");
+
+        name.textContent = supplier.supplier_name || "Unnamed supplier";
+        row.append(
+          name,
+          document.createTextNode(
+            " — " + (supplier.phone || "No phone") +
+            " · " + (supplier.email || "No email")
+          )
+        );
+
+        supplierList.append(row);
+      });
+    })
+    .catch(error => {
+      supplierList.textContent = "Could not load suppliers.";
+      console.error(error);
+    });
+</script>
   </body>
 </html>
